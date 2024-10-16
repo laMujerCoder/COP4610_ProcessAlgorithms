@@ -1,19 +1,24 @@
 # COP4610_ProcessAlgorithms
 
 Project objective: To learn more about OS scheduling through a hands-on simulation programming experience
+
 Implements the following 3 CPU scheduling algorithms
  Simulate and evaluate each with the set of eight processes below.
- Use any programming language. The program listing should be submitted with the report.
+ Use any programming language. 
+
+Queues
 1. FCFS non-preemptive (partial results provided)
 2. SJF non-preemptive
 3. MLFQ
-Multilevel Feedback Queue (absolute priority in higher queues)
-Queue 1 uses RR scheduling with Tq = 5
-Queue 2 uses RR scheduling with Tq = 10
-Queue 3 uses FCFS
+  Multilevel Feedback Queue (absolute priority in higher queues)
+  Queue 1 uses RR scheduling with Tq = 5
+  Queue 2 uses RR scheduling with Tq = 10
+  Queue 3 uses FCFS
+
 All processes enter first queue 1. If time quantum (Tq) expires before CPU burst is complete, the
 process is downgraded to next lower priority queue. Processes are not downgraded when preempted by a
 higher queue level process. Once a process has been downgraded, it will not be upgraded.
+
 Assumptions:
 1. All processes are activated at time 0
 2. Assume that no process waits on I/O devices.
@@ -21,6 +26,8 @@ Assumptions:
 4. Waiting time is accumulated while a process waits in the ready queue.
 5. Turnaround time is a total of (Waiting time) + (CPU burst time) + (I/O time)
 6. Response time is the first measure of waiting time from arrival at time 0 until the first time on the CPU.
+
+   
 Process Data:
 process goes {CPU burst, I/O time, CPU burst, I/O time, CPU burst, I/O time,........, last CPU burst}
 P1 {5, 27, 3, 31, 5, 43, 4, 18, 6, 22, 4, 26, 3, 24, 4}
