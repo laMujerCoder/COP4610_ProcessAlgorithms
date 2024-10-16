@@ -27,7 +27,6 @@ Assumptions:
 5. Turnaround time is a total of (Waiting time) + (CPU burst time) + (I/O time)
 6. Response time is the first measure of waiting time from arrival at time 0 until the first time on the CPU.
 
-   
 Process Data:
 process goes {CPU burst, I/O time, CPU burst, I/O time, CPU burst, I/O time,........, last CPU burst}
 P1 {5, 27, 3, 31, 5, 43, 4, 18, 6, 22, 4, 26, 3, 24, 4}
