@@ -64,6 +64,7 @@ namespace COP4610_ProcessAlgorithms
                     //first check if all processes are done running and nothing in i/o
                     if (AllProcesssesDoneMethod())
                     {
+                        RunningSingleQueueProcesses.TimeAllProcessesFinished = Time - 1; 
                         AllProcessesDone = true;
                     }
                     else if (ProcessInReadyQueue()) //check if there atleast one process in ready queue also updates which queue is in use based on priority 
@@ -85,11 +86,14 @@ namespace COP4610_ProcessAlgorithms
                
             }
 
-            var ProcessesList = Processesfinished.OrderBy(x => x.p_num);
-            foreach (var i in ProcessesList)
-            {
-                Console.WriteLine(i.p_num + " " + i.waiting_time + " " + i.turnaroundtime + " " + i.responsetime);
-            }
+            
+            IEnumerable<Process> ProcessesList = Processesfinished.OrderBy(x => x.p_num);
+            RunningSingleQueueProcesses.PrintProcessStats(ProcessesList);
+            //var ProcessesList = Processesfinished.OrderBy(x => x.p_num);
+            //foreach (var i in ProcessesList)
+            //{
+            //    Console.WriteLine(i.p_num + " " + i.waiting_time + " " + i.turnaroundtime + " " + i.responsetime);
+            //}
         }
 
         public bool AllProcesssesDoneMethod()
@@ -124,7 +128,9 @@ namespace COP4610_ProcessAlgorithms
         public void UpdateIOProcesses()
         {
             if (Processes_In_I_O.Count == 0)
-            { return; }
+            {
+                RunningSingleQueueProcesses.CPUNotInUse++; 
+                return; }
 
             foreach (var i in Processes_In_I_O.ToList())
             {
@@ -161,13 +167,13 @@ namespace COP4610_ProcessAlgorithms
             }
                          
             //check tq has been reached if in RR Queue 
-            if ((IsRR) && RunningProcess.TqTimeLeft == 0) 
+            if ((IsRR) && RunningProcess.TqTimeLeft == 0 && burstTime !=0) 
             { 
                 MoveToNextQueue(); 
                 TqReached = true;
             }
 
-            if (burstTime == 0) //cpu burst is done 
+            if (burstTime == 0 ) //cpu burst is done 
             {
                 // check if last cpu burst
                 if (RunningSingleQueueProcesses.BurstsAllFinished(RunningProcess.burst_list))

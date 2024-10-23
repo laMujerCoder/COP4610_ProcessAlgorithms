@@ -47,6 +47,7 @@ namespace COP4610_ProcessAlgorithms
         {
             while (!AllProcessesDone)
             {
+                //Console.WriteLine("Time:" + Time);
                 Time++;
 
                 //Add from ready queue if not process is currently running
@@ -64,6 +65,10 @@ namespace COP4610_ProcessAlgorithms
                         RunningProcess = Ready_Queue.First();
                         CheckIfFirstBurst(); // if first burst take note of response time
                         Ready_Queue.Dequeue();
+                        //if (RunningProcess != null)
+                        //{
+                        //    Console.WriteLine("Process: " + RunningProcess.p_num);
+                        //}
                     }
                 }
 
