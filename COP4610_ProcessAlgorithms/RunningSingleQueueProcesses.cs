@@ -16,7 +16,8 @@ namespace COP4610_ProcessAlgorithms
         public bool AllProcessesDone = false;
         public bool IsFCFS;
         public int CPUNotInUse = 0;
-        public int TimeAllProcessesFinished; 
+        public int TimeAllProcessesFinished;
+        public bool ContextSwitch = false; 
 
         public RunningSingleQueueProcesses()
         {
@@ -47,9 +48,9 @@ namespace COP4610_ProcessAlgorithms
         {
             while (!AllProcessesDone)
             {
-                //Console.WriteLine("Time:" + Time);
+               
                 Time++;
-
+                 
                 //Add from ready queue if not process is currently running
                 if (RunningProcess == null)
                 {
@@ -65,25 +66,70 @@ namespace COP4610_ProcessAlgorithms
                         RunningProcess = Ready_Queue.First();
                         CheckIfFirstBurst(); // if first burst take note of response time
                         Ready_Queue.Dequeue();
-                        //if (RunningProcess != null)
-                        //{
-                        //    Console.WriteLine("Process: " + RunningProcess.p_num);
-                        //}
+                        ContextSwitch = true;
                     }
                 }
 
-                    //Add waiting time to those in waiting in ready queue
-                    AddWaitingTime();
-   
-                    //subtract i/o burst time from processes in i/0
-                    UpdateIOProcesses();
+                Console.WriteLine("Time:" + Time);
+                //print info 
+                if (ContextSwitch)
+                {
+                    PrintCurrentStates();
+                }
 
-                    //subtract cpu burst time from running process
-                    UpdateRunningProcess();
+                ContextSwitch = false;
+
+
+                //Add waiting time to those in waiting in ready queue
+                AddWaitingTime();
+   
+                //subtract i/o burst time from processes in i/0
+                UpdateIOProcesses();
+
+                //subtract cpu burst time from running process
+                UpdateRunningProcess();
             }
 
             IEnumerable<Process> ProcessesList = Processesfinished.OrderBy(x => x.p_num);
             PrintProcessStats(ProcessesList);
+        }
+        public void PrintCurrentStates()
+        {
+            if (RunningProcess != null) { Console.WriteLine(
+                "Running Process: " + RunningProcess.p_num);
+            }
+            else { Console.WriteLine("No Process in CPU"); }
+            Console.WriteLine("Processes in Ready Queue   CPU Burst Time ");
+            foreach (var i in Ready_Queue)
+            {
+                
+                Console.WriteLine(i.p_num+ "                              " +i.upcoming_cpuburst_time);
+                
+            }
+            if(Processes_In_I_O.Any())
+            {
+                Console.WriteLine("Processes in I/O   Remaining I/O Burst");
+                foreach (var i_o in Processes_In_I_O)
+                {
+                    Console.WriteLine(i_o.p_num+ "                   " + FindNextBurstTime(i_o.burst_list));
+                }
+            }
+            else
+            {
+                Console.WriteLine("No processes in I/O");
+            }
+            if (Processesfinished.Any())
+            {
+                Console.WriteLine("Finished Processes");
+                foreach (var proc in Processesfinished)
+                {
+                    Console.WriteLine(proc.p_num);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No Finished Processes");
+            }
         }
 
         public void CheckIfFirstBurst()
@@ -112,6 +158,7 @@ namespace COP4610_ProcessAlgorithms
                 int bursttime = SubtractTimeFromBurst(i.burst_list);
                 if (bursttime == 0) //if i/0 is done move to ready queue and remove from i/0
                 {
+                    ContextSwitch = true; //since we are adding to ready queue 
                     Ready_Queue.Enqueue(i);
                     Processes_In_I_O.Remove(i);
 
@@ -153,6 +200,7 @@ namespace COP4610_ProcessAlgorithms
 
             if (burstTime == 0) //cpu burst is done
             {
+                ContextSwitch = true; //since we are removing
                 // check if last cpu burst
                 if (BurstsAllFinished(RunningProcess.burst_list))
                 {
@@ -230,6 +278,26 @@ namespace COP4610_ProcessAlgorithms
             burstlist[j]--;
             return burstlist[j];
         }
+
+        public int FindNextBurstTime(int[] burstlist)
+        {
+            bool foundBurst = false;
+            int j = 0;
+
+            while (!foundBurst)
+            {
+                for (int i = 0; i < burstlist.Length; i++)
+                {
+                    if (burstlist[i] != 0)
+                    {
+                        j = i;
+                        foundBurst = true;
+                        break;
+                    }
+                }
+            }
+            return burstlist[j]; 
+        }
         public void PrintProcessStats(IEnumerable<Process> processList)
         {
             int twTotal = 0, ttrTotal = 0, trTotal = 0;
@@ -254,6 +322,7 @@ namespace COP4610_ProcessAlgorithms
 
             cpuUsage = (TimeAllProcessesFinished- CPUNotInUse) / (double)TimeAllProcessesFinished ;
             Console.WriteLine("CPU utilization: " + cpuUsage.ToString("P"));
+            Console.WriteLine("Total Time for All 8 Processes: " + TimeAllProcessesFinished);
         }
     } 
 }

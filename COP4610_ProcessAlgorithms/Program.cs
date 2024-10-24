@@ -10,13 +10,13 @@ List<Process> run3 = prepareProcesses.ReturnProcesses();
 
 
 
-RunningSingleQueueProcesses runProcessFCFS = new RunningSingleQueueProcesses(run1, true);
-runProcessFCFS.RunProcesses();
+//RunningSingleQueueProcesses runProcessFCFS = new RunningSingleQueueProcesses(run1, true);
+//runProcessFCFS.RunProcesses();
 
-RunningSingleQueueProcesses runProcessSJC = new RunningSingleQueueProcesses(run2, false);
-runProcessSJC.RunProcesses();
+//RunningSingleQueueProcesses runProcessSJC = new RunningSingleQueueProcesses(run2, false);
+//runProcessSJC.RunProcesses();
 
 
 
-//MultiLevelQueue runProcess = new MultiLevelQueue(run3);
-//runProcess.RunProcesses();
+MultiLevelQueue runProcess = new MultiLevelQueue(run3);
+runProcess.RunProcesses();

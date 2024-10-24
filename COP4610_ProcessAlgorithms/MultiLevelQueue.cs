@@ -55,7 +55,7 @@ namespace COP4610_ProcessAlgorithms
         {
             while (!AllProcessesDone)
             {
-                Console.WriteLine("Time:" +Time);
+                
                 Time++;
 
                 //Add from ready queue if not process is currently running
@@ -70,13 +70,18 @@ namespace COP4610_ProcessAlgorithms
                     else if (ProcessInReadyQueue()) //check if there atleast one process in ready queue also updates which queue is in use based on priority 
                     {
                        AddProcessFromReadyQueue();
-                        if(RunningProcess != null)
-                        {
-                            Console.WriteLine("Process: " +RunningProcess.p_num);
-                        }
-                        
+                        RunningSingleQueueProcesses.ContextSwitch = true; 
                     }
                 }
+
+                Console.WriteLine("Time:" + Time);
+                //print info 
+                if (RunningSingleQueueProcesses.ContextSwitch)
+                {
+                    PrintCurrentStates();
+                }
+
+                RunningSingleQueueProcesses.ContextSwitch = false;
 
                 AddWaitingTime();  
 
@@ -89,11 +94,6 @@ namespace COP4610_ProcessAlgorithms
             
             IEnumerable<Process> ProcessesList = Processesfinished.OrderBy(x => x.p_num);
             RunningSingleQueueProcesses.PrintProcessStats(ProcessesList);
-            //var ProcessesList = Processesfinished.OrderBy(x => x.p_num);
-            //foreach (var i in ProcessesList)
-            //{
-            //    Console.WriteLine(i.p_num + " " + i.waiting_time + " " + i.turnaroundtime + " " + i.responsetime);
-            //}
         }
 
         public bool AllProcesssesDoneMethod()
@@ -104,6 +104,77 @@ namespace COP4610_ProcessAlgorithms
             }
             return false;
         }
+
+        public void PrintCurrentStates()
+        { 
+            //print running process if any 
+            if (RunningProcess != null)
+            {
+                Console.WriteLine(
+                "Running Process: " + RunningProcess.p_num);
+            }
+            else { Console.WriteLine("No Process in CPU"); }
+            
+            //print processe in ready queues
+            if (ReadyQueue1.Ready_Queue.Any())
+            {
+                Console.WriteLine("Processes in Ready Queue 1   CPU Burst Time ");
+                foreach (var i in ReadyQueue1.Ready_Queue)
+                {
+
+                    Console.WriteLine(i.p_num + "                              " + i.upcoming_cpuburst_time);
+
+                }
+            }
+
+            if (ReadyQueue2.Ready_Queue.Any())
+            {
+                Console.WriteLine("Processes in Ready Queue 2   CPU Burst Time ");
+                foreach (var i in ReadyQueue2.Ready_Queue)
+                {
+
+                    Console.WriteLine(i.p_num + "                              " + i.upcoming_cpuburst_time);
+
+                }
+            }
+            if (ReadyQueue3.Ready_Queue.Any())
+            {
+                Console.WriteLine("Processes in Ready Queue 3   CPU Burst Time ");
+                foreach (var i in ReadyQueue3.Ready_Queue)
+                {
+
+                    Console.WriteLine(i.p_num + "                              " + i.upcoming_cpuburst_time);
+
+                }
+            }
+            //print i/o
+            if (Processes_In_I_O.Any())
+            {
+                Console.WriteLine("Processes in I/O   Remaining I/O Burst");
+                foreach (var i_o in Processes_In_I_O)
+                {
+                    Console.WriteLine(i_o.p_num + "                   " + RunningSingleQueueProcesses.FindNextBurstTime(i_o.burst_list));
+                }
+            }
+            else
+            {
+                Console.WriteLine("No processes in I/O");
+            }
+            // print finished processes if any 
+            if (Processesfinished.Any())
+            {
+                Console.WriteLine("Finished Processes");
+                foreach (var proc in Processesfinished)
+                {
+                    Console.WriteLine(proc.p_num);
+                }
+            }
+            else
+            {
+                Console.WriteLine("No Finished Processes");
+            }
+        }
+
 
         public void AddWaitingTime()
         {
@@ -137,6 +208,8 @@ namespace COP4610_ProcessAlgorithms
                 int bursttime = RunningSingleQueueProcesses.SubtractTimeFromBurst(i.burst_list);
                 if (bursttime == 0) //if i/0 is done move to ready queue and remove from i/0
                 {
+                    i.upcoming_cpuburst_time = RunningSingleQueueProcesses.FindNextBurstTime(i.burst_list); 
+                    RunningSingleQueueProcesses.ContextSwitch = true; 
                     AddToReadyQueue(i);
                     Processes_In_I_O.Remove(i);
 
@@ -187,11 +260,16 @@ namespace COP4610_ProcessAlgorithms
                     Processes_In_I_O.Add(RunningProcess);
                 }
                 RunningProcess = null; // remove from cpu usage 
+
+                RunningSingleQueueProcesses.ContextSwitch = true; 
             }
             else if (TqReached)
             {//re-add to ready queue 
+                RunningProcess.upcoming_cpuburst_time= RunningSingleQueueProcesses.FindNextBurstTime(RunningProcess.burst_list);
                 AddToReadyQueue(RunningProcess); //to do: Re name method later 
                 RunningProcess = null; // remove from cpu usage 
+
+                RunningSingleQueueProcesses.ContextSwitch = true; // to display information later 
             }
             
             

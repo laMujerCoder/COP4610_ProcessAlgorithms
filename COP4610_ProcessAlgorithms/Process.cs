@@ -21,6 +21,7 @@ namespace COP4610_ProcessAlgorithms
         {
             p_num = process_number;
             burst_list = burstlist;
+            upcoming_cpuburst_time= burst_list[0];
         }
     }
 }
