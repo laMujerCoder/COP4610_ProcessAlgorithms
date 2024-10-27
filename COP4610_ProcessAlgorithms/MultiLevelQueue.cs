@@ -19,7 +19,6 @@ namespace COP4610_ProcessAlgorithms
         public bool AllProcessesDone = false;
         public int QueueInUse = 1; // could be 1,2, or 3 
 
-
         //constants
         public int Queue1TQ = 5;
         public int Queue2TQ = 10; 
